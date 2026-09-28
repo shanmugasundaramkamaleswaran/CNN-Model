@@ -22,7 +22,10 @@ from keras.models import Model
 import numpy as np
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 #extracting 'fc1'(fully connected layer 1) layer from base_model and storing it in model
@@ -45,18 +48,22 @@ model2.add(Dense(1000,activation='softmax'))
 
 #image is loaded from url
 #you can use imread to load loacally 
+import os
 from urllib.request import urlopen, Request
 import io
 
 #url of the image is stored in url_link1
-req = Request("https://secure.img1-fg.wfcdn.com/im/60243122/resize-h800%5Ecompr-r85/4037/40372281/Corona+Extendable+Dining+Table.jpg", headers={'User-Agent': 'Mozilla/5.0'})
-url_link1 = urlopen(req)
-
-#(224,224) is the target size of resnet50 model
-img = image.load_img(io.BytesIO(url_link1.read()), target_size=(224,224))
+local_img = os.path.join(os.path.dirname(__file__), "..", "sample_images", "table.jpg")
+if os.path.exists(local_img):
+    img = image.load_img(local_img, target_size=(224,224))
+else:
+    req = Request("https://secure.img1-fg.wfcdn.com/im/60243122/resize-h800%5Ecompr-r85/4037/40372281/Corona+Extendable+Dining+Table.jpg", headers={'User-Agent': 'Mozilla/5.0'})
+    url_link1 = urlopen(req)
+    img = image.load_img(io.BytesIO(url_link1.read()), target_size=(224,224))
 
 #visuvalising input image
-plt.imshow(img)
+if plt is not None:
+    plt.imshow(img)
 
 #preprocessing input image
 x=image.img_to_array(img)

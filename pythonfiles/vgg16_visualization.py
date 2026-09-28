@@ -37,4 +37,8 @@ except ImportError:
     SVG = None
 
 #block representation of the model
-SVG(model_to_dot(model).create(prog='dot',format='svg'))
+try:
+    if SVG:
+        SVG(model_to_dot(model).create(prog='dot',format='svg'))
+except Exception as e:
+    print(f"Graphviz SVG visualization skipped (requires Graphviz binary installed): {e}")

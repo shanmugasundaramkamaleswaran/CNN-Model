@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNN Vision Neural Explorer | Pretrained Keras Deep Learning Hub</title>
+    <meta name="description" content="Explore pretrained Convolutional Neural Networks (ResNet50, VGG16, VGG19, InceptionV3) with live ImageNet classification, feature extraction, and architecture inspection.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <div class="app-container">
+        <!-- Top Navigation / Header -->
+        <header class="studio-header">
+            <div class="header-left">
+                <div class="brand-badge">
+                    <span class="pulse-dot"></span>
+                    <span>CNN Vision Studio • Keras & TensorFlow</span>
+                </div>
+                <h1 class="brand-title">Neural Vision Explorer</h1>
+                <p class="brand-subtitle">Interactive pretrained ImageNet models with feature extraction & model benchmarking.</p>
+            </div>
+            <div class="header-right">
+                <div class="stats-pill">
+                    <span class="pill-label">Active Models</span>
+                    <span class="pill-value">4 Pretrained</span>
+                </div>
+                <div class="stats-pill">
+                    <span class="pill-label">Dataset</span>
+                    <span class="pill-value">ImageNet-1K</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Navigation Tabs -->
+        <nav class="studio-tabs">
+            <button class="tab-btn active" data-tab="tab-predict" id="tabPredictBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6Z"/></svg>
+                <span>Live Classification</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-extract" id="tabExtractBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                <span>Feature Extraction</span>
+            </button>
+            <button class="tab-btn" data-tab="tab-architecture" id="tabArchBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Architecture Explorer</span>
+            </button>
+        </nav>
+
+        <!-- TAB 1: Live Classification -->
+        <section class="tab-content active" id="tab-predict">
+            <div class="workbench-grid">
+                <!-- Left Control Panel: Image & Model Selection -->
+                <div class="control-panel glass-card">
+                    <div class="panel-section">
+                        <div class="section-header">
+                            <span class="section-step">1</span>
+                            <h3>Select Input Image</h3>
+                        </div>
+                        
+                        <!-- Preset Quick Picks -->
+                        <div class="preset-selector">
+                            <label class="field-label">Sample Presets:</label>
+                            <div class="preset-chips">
+                                <button class="preset-btn active" data-preset="elephant" id="presetElephant">
+                                    <img src="/api/sample-images/elephant.jpg" alt="Elephant" class="preset-thumb">
+                                    <span>Elephant</span>
+                                </button>
+                                <button class="preset-btn" data-preset="table" id="presetTable">
+                                    <img src="/api/sample-images/table.jpg" alt="Dining Table" class="preset-thumb">
+                                    <span>Dining Table</span>
+                                </button>
+                                <button class="preset-btn" data-preset="sharpener" id="presetSharpener">
+                                    <img src="/api/sample-images/sharpener.jpg" alt="Sharpener" class="preset-thumb">
+                                    <span>Sharpener</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Dropzone or URL -->
+                        <div class="upload-options">
+                            <div class="dropzone" id="dropzone">
+                                <input type="file" id="fileInput" accept="image/*" class="file-hidden">
+                                <div class="dropzone-content">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    <p><strong>Click to browse</strong> or drag & drop</p>
+                                    <span class="subtext">JPG, PNG, WebP supported</span>
+                                </div>
+                            </div>
+
+                            <div class="url-input-row">
+                                <input type="url" id="customUrlInput" placeholder="Or paste an image web URL..." class="text-input">
+                                <button class="btn btn-outline" id="loadUrlBtn">Fetch</button>
+                            </div>
+                        </div>
+
+                        <!-- Image Preview Box -->
+                        <div class="preview-box">
+                            <img id="imagePreview" src="/api/sample-images/elephant.jpg" alt="Preview Image">
+                            <div class="preview-overlay" id="previewMeta">
+                                <span id="previewResolution">224 × 224 px</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <div class="section-header">
+                            <span class="section-step">2</span>
+                            <h3>Select CNN Model</h3>
+                        </div>
+
+                        <div class="model-cards-grid">
+                            <div class="model-select-card active" data-model="resnet50" id="cardResnet50">
+                                <div class="model-card-header">
+                                    <span class="model-title">ResNet-50</span>
+                                    <span class="model-badge green">25.6M Params</span>
+                                </div>
+                                <p class="model-card-desc">Residual skip blocks handling deep gradients</p>
+                                <span class="model-dim">Input: 224×224</span>
+                            </div>
+
+                            <div class="model-select-card" data-model="vgg16" id="cardVgg16">
+                                <div class="model-card-header">
+                                    <span class="model-title">VGG-16</span>
+                                    <span class="model-badge blue">138.4M Params</span>
+                                </div>
+                                <p class="model-card-desc">16 weight layers with 3×3 convolution filters</p>
+                                <span class="model-dim">Input: 224×224</span>
+                            </div>
+
+                            <div class="model-select-card" data-model="vgg19" id="cardVgg19">
+                                <div class="model-card-header">
+                                    <span class="model-title">VGG-19</span>
+                                    <span class="model-badge purple">143.7M Params</span>
+                                </div>
+                                <p class="model-card-desc">Deep 19-layer network with rich representations</p>
+                                <span class="model-dim">Input: 224×224</span>
+                            </div>
+
+                            <div class="model-select-card" data-model="inceptionv3" id="cardInceptionv3">
+                                <div class="model-card-header">
+                                    <span class="model-title">Inception-v3</span>
+                                    <span class="model-badge cyan">23.8M Params</span>
+                                </div>
+                                <p class="model-card-desc">Multi-scale factorized convolutions (Hebbian)</p>
+                                <span class="model-dim">Input: 299×299</span>
+                            </div>
+
+                            <div class="model-select-card compare-all" data-model="all" id="cardCompareAll">
+                                <div class="model-card-header">
+                                    <span class="model-title">⚡ Benchmark All 4</span>
+                                    <span class="model-badge orange">Comparison</span>
+                                </div>
+                                <p class="model-card-desc">Run ResNet50, VGG16, VGG19, and InceptionV3 side-by-side</p>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary run-predict-btn" id="runPredictBtn">
+                            <span class="btn-spinner hidden" id="predictSpinner"></span>
+                            <span class="btn-text" id="predictBtnText">Run Neural Inference</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Display Panel: Prediction Results -->
+                <div class="results-panel glass-card" id="resultsContainer">
+                    <div class="results-header">
+                        <div class="results-title-group">
+                            <h2 id="resultsModelHeading">Inference Output</h2>
+                            <span class="status-indicator live" id="liveStatus">Ready</span>
+                        </div>
+                        <div class="latency-indicator" id="latencyBadge">
+                            <span class="latency-dot"></span>
+                            <span id="latencyText">Awaiting inference...</span>
+                        </div>
+                    </div>
+
+                    <!-- Single Model Results View -->
+                    <div class="single-results-view" id="singleResultsView">
+                        <div class="primary-prediction-banner" id="primaryPredictionCard">
+                            <div class="top-label-badge">Top Prediction</div>
+                            <div class="prediction-main-row">
+                                <h1 class="predicted-class" id="topClassName">African Elephant</h1>
+                                <div class="predicted-confidence" id="topClassConfidence">96.2%</div>
+                            </div>
+                            <div class="class-id-tag" id="topClassId">ILSVRC ID: n02504458</div>
+                        </div>
+
+                        <div class="top-predictions-list">
+                            <h4 class="list-heading">Top-5 Probabilities Breakdown</h4>
+                            <div class="probability-bars" id="probBarsContainer">
+                                <!-- Populated dynamically by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparative All-4 Benchmark View -->
+                    <div class="comparison-results-view hidden" id="comparisonResultsView">
+                        <div class="comparison-grid" id="comparisonGrid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Feature Extraction -->
+        <section class="tab-content" id="tab-extract">
+            <div class="workbench-grid">
+                <!-- Controls for feature extraction -->
+                <div class="control-panel glass-card">
+                    <div class="section-header">
+                        <span class="section-step">1</span>
+                        <h3>Feature Extraction Setup</h3>
+                    </div>
+                    <p class="panel-explainer">
+                        Extract the intermediate latent representations before final classification. As demonstrated in the repository notebooks, you can capture dense vectors from InceptionV3's <code>avg_pool</code> layer or VGG19's <code>fc1</code> fully connected layer.
+                    </p>
+
+                    <div class="form-group">
+                        <label class="field-label">Target Architecture:</label>
+                        <select id="extractModelSelect" class="select-input">
+                            <option value="inceptionv3">Inception-v3 (Extract avg_pool, mixed10)</option>
+                            <option value="vgg19">VGG-19 (Extract fc1, fc2, block5_pool)</option>
+                            <option value="resnet50">ResNet-50 (Extract avg_pool, conv5_block3_out)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="field-label">Target Hidden Layer:</label>
+                        <select id="extractLayerSelect" class="select-input">
+                            <option value="avg_pool">avg_pool (GlobalAveragePooling2D - 2048 dims)</option>
+                            <option value="mixed10">mixed10 (Final Inception Block)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="field-label">Input Image Preset:</label>
+                        <div class="preset-chips">
+                            <button class="preset-btn active" data-extract-preset="sharpener">
+                                <span>Sharpener</span>
+                            </button>
+                            <button class="preset-btn" data-extract-preset="elephant">
+                                <span>Elephant</span>
+                            </button>
+                            <button class="preset-btn" data-extract-preset="table">
+                                <span>Dining Table</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="runExtractBtn">
+                        <span class="btn-spinner hidden" id="extractSpinner"></span>
+                        <span class="btn-text">Extract Latent Embeddings</span>
+                    </button>
+                </div>
+
+                <!-- Feature Extraction Visualization Panel -->
+                <div class="results-panel glass-card">
+                    <div class="results-header">
+                        <div class="results-title-group">
+                            <h2>Latent Feature Vector Analytics</h2>
+                            <span class="status-indicator" id="extractStatus">Latent Representation</span>
+                        </div>
+                        <div class="latency-indicator" id="extractLatencyBadge">
+                            <span id="extractLatencyText">Awaiting extraction</span>
+                        </div>
+                    </div>
+
+                    <div class="embedding-stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Vector Dimension</span>
+                            <span class="stat-val" id="featDim">2,048</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Max Activation</span>
+                            <span class="stat-val" id="featMax">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Mean Activation</span>
+                            <span class="stat-val" id="featMean">--</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Sparsity (Zero %)</span>
+                            <span class="stat-val" id="featSparsity">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="feature-map-section">
+                        <h4 class="list-heading">First 64 Activation Values (Heatmap Preview)</h4>
+                        <div class="activation-matrix" id="activationMatrix">
+                            <!-- 64 cells generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="top-neurons-section">
+                        <h4 class="list-heading">Top 16 Strongest Firing Neurons</h4>
+                        <div class="neuron-chips" id="topNeuronsContainer">
+                            <!-- Dynamic chips -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Architecture Explorer -->
+        <section class="tab-content" id="tab-architecture">
+            <div class="glass-card full-width">
+                <div class="arch-top-bar">
+                    <div>
+                        <h2>Deep Convolutional Architecture Specifications</h2>
+                        <p class="text-muted">Inspect the structural blueprints, parameter hierarchies, and filter layers of each pretrained CNN model.</p>
+                    </div>
+                    <div class="arch-switcher">
+                        <button class="pill-btn active" data-arch="resnet50">ResNet-50</button>
+                        <button class="pill-btn" data-arch="vgg16">VGG-16</button>
+                        <button class="pill-btn" data-arch="vgg19">VGG-19</button>
+                        <button class="pill-btn" data-arch="inceptionv3">Inception-v3</button>
+                    </div>
+                </div>
+
+                <div class="arch-meta-cards" id="archMetaContainer">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="layers-table-container">
+                    <div class="table-search-row">
+                        <input type="text" id="layerSearchInput" placeholder="Filter layers by name or type (e.g. Conv2D, Dense, pool)..." class="text-input">
+                        <span class="layer-counter" id="layerCountText">Showing layers</span>
+                    </div>
+                    <div class="table-scroll-wrapper">
+                        <table class="layers-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Layer Name</th>
+                                    <th>Layer Class</th>
+                                    <th>Output Tensor Shape</th>
+                                    <th>Trainable Parameters</th>
+                                </tr>
+                            </thead>
+                            <tbody id="layersTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="studio-footer">
+            <p>CNN Vision Neural Explorer • Powered by Keras 3, TensorFlow, and ImageNet Pretrained Weights</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

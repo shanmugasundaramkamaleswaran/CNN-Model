@@ -24,7 +24,10 @@ from keras.applications.inception_v3 import preprocess_input,decode_predictions
 from keras.preprocessing import image
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 input_tensor=Input(shape=(299,299,3))
@@ -34,12 +37,14 @@ base_model=InceptionV3(input_tensor=input_tensor,weights='imagenet',include_top=
 
 #image is loaded from url
 #you can use imread to load loacally 
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
+import io
 
 #url of the image is stored in url_link1
 #(299,299) is the target size of Inceptionv3 model
-urllink=urlopen("https://5.imimg.com/data5/OX/YI/MY-19292667/green-color-sharpener-500x500.jpg")
-img=image.load_img(urllink,target_size=(299,299))
+req = Request("https://5.imimg.com/data5/OX/YI/MY-19292667/green-color-sharpener-500x500.jpg", headers={'User-Agent': 'Mozilla/5.0'})
+urllink = urlopen(req)
+img = image.load_img(io.BytesIO(urllink.read()), target_size=(299,299))
 import numpy as np
 
 #preprocessing input image

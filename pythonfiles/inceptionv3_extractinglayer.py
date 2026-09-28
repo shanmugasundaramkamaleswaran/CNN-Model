@@ -14,7 +14,10 @@ from keras.applications.inception_v3 import preprocess_input,decode_predictions
 from keras.preprocessing import image
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 input_tensor=Input(shape=(299,299,3))

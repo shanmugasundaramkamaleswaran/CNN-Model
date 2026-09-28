@@ -8,7 +8,10 @@ from keras.applications.inception_v3 import preprocess_input,decode_predictions
 from keras.preprocessing import image
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 input_tensor=Input(shape=(299,299,3))
@@ -23,12 +26,19 @@ model=Model(inputs=base_model.input,outputs=base_model.get_layer('avg_pool').out
 
 #image is loaded from url
 #you can use imread to load loacally 
-from urllib.request import urlopen
+import os
+from urllib.request import urlopen, Request
+import io
 
 #url of the image is stored in url_link1
 #(299,299) is the target size of Inceptionv3 model
-urllink=urlopen("https://5.imimg.com/data5/OX/YI/MY-19292667/green-color-sharpener-500x500.jpg")
-img=image.load_img(urllink,target_size=(299,299))
+local_img = os.path.join(os.path.dirname(__file__), "..", "sample_images", "sharpener.jpg")
+if os.path.exists(local_img):
+    img = image.load_img(local_img, target_size=(299,299))
+else:
+    req = Request("https://5.imimg.com/data5/OX/YI/MY-19292667/green-color-sharpener-500x500.jpg", headers={'User-Agent': 'Mozilla/5.0'})
+    urllink = urlopen(req)
+    img = image.load_img(io.BytesIO(urllink.read()), target_size=(299,299))
 import numpy as np
 
 #preprocessing input image
@@ -66,13 +76,17 @@ try:
 except ImportError:
     SVG = None
 
-#model of base_model(complete VGG19)
-SVG(model_to_dot(base_model).create(prog='dot',format='svg'))
+try:
+    if SVG is not None:
+        #model of base_model
+        SVG(model_to_dot(base_model).create(prog='dot',format='svg'))
 
-#below you can see that model contains blocks till 'avg_pool' layer (model)
-#extracted model
-SVG(model_to_dot(model).create(prog='dot',format='svg'))
+        #below you can see that model contains blocks till 'avg_pool' layer (model)
+        #extracted model
+        SVG(model_to_dot(model).create(prog='dot',format='svg'))
 
-#after addition of dense1 layer for softmax prediction(model+softmax) 
-#(extracted layer+ softmax)--->predictions
-SVG(model_to_dot(model2).create(prog='dot',format='svg'))
+        #after addition of dense1 layer for softmax prediction(model+softmax) 
+        #(extracted layer+ softmax)--->predictions
+        SVG(model_to_dot(model2).create(prog='dot',format='svg'))
+except (FileNotFoundError, OSError, Exception) as e:
+    print(f"Graphviz SVG visualization skipped (requires Graphviz system binary): {e}")

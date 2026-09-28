@@ -19,23 +19,29 @@ from keras.applications.resnet50 import preprocess_input,decode_predictions
 import numpy as np
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 model=ResNet50(weights='imagenet',include_top=True)
 
 #image is loaded from url
 #you can use imread to load loacally 
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
+import io
 
 #url of the image is stored in url_link1
-url_link1=urlopen("https://secure.img1-fg.wfcdn.com/im/60243122/resize-h800%5Ecompr-r85/4037/40372281/Corona+Extendable+Dining+Table.jpg")
+req1 = Request("https://secure.img1-fg.wfcdn.com/im/60243122/resize-h800%5Ecompr-r85/4037/40372281/Corona+Extendable+Dining+Table.jpg", headers={'User-Agent': 'Mozilla/5.0'})
+url_link1 = urlopen(req1)
 
 #(224,224) is the target size of resnet50 model
-img1=image.load_img(url_link1,target_size=(224,224))
+img1=image.load_img(io.BytesIO(url_link1.read()),target_size=(224,224))
 
 #visuvalising input image
-plt.imshow(img1)
+if plt is not None:
+    plt.imshow(img1)
 
 #preprocessing input image
 x1=image.img_to_array(img1)

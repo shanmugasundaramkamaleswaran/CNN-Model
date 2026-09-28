@@ -19,23 +19,29 @@ from keras.applications.vgg19 import preprocess_input,decode_predictions
 import numpy as np
 
 #For visualising picture
-from matplotlib import pyplot as plt
+try:
+    from matplotlib import pyplot as plt
+except Exception:
+    plt = None
 # %matplotlib inline
 
 base_model=VGG19(weights='imagenet',include_top=True)
 
-#image is loaded from url
-#you can use imread to load loacally 
-from urllib.request import urlopen
+import os
+from urllib.request import urlopen, Request
+import io
 
-#url of the image is stored in url_link1
-urllink=urlopen("https://razzonline.com/wp-content/uploads/2017/07/an-elephant-.jpg")
-
-#(224,224) is the target size of resnet50 model
-img=image.load_img(urllink,target_size=(224,224))
+#image is loaded from local sample or url
+local_img = os.path.join(os.path.dirname(__file__), "..", "sample_images", "elephant.jpg")
+if os.path.exists(local_img):
+    img = image.load_img(local_img, target_size=(224,224))
+else:
+    req = Request("https://upload.wikimedia.org/wikipedia/commons/3/37/African_Bush_Elephant.jpg", headers={'User-Agent': 'Mozilla/5.0'})
+    img = image.load_img(io.BytesIO(urlopen(req).read()), target_size=(224,224))
 
 #visuvalising input image
-plt.imshow(img)
+if plt is not None:
+    plt.imshow(img)
 
 #preprocessing input image
 x=image.img_to_array(img)
